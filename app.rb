@@ -96,6 +96,7 @@ end
 get '/meetups/:meetup_id' do
   @meetup = Meetup.find(params[:meetup_id])
   @members = @meetup.users
+  @comments = @meetup.comments
   erb :'meetups/show'
 end
 
