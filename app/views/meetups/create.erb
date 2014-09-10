@@ -1,0 +1,9 @@
+  <form action="/meetups/submit" method="post">
+    <label for="post_title"></label>
+    <div><input type="text" style="width: 333px" id="meetup_name" name="meetup[name]" value="<%=@meetup[:name] if @meetup%>"placeholder="Your name"/></div>
+    <div><input type="text" style="width: 333px" id="location" name="meetup[location]" value="<%=@meetup[:location] if @meetup%>"placeholder="Post title"/></div>
+    <div>
+      <textarea type="text" id="meetup_description" name="meetup[description]" rows="6" cols="60" placeholder="Description..."><%=@meetup[:description]  if @meetup%></textarea>
+    </div>
+    <input type="submit" value="Submit Meetup"/>
+  </form>

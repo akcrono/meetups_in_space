@@ -1,0 +1,18 @@
+<h2><%=@meetup.name%></h2>
+<p><%=@meetup.location%></p>
+<p><%=@meetup.description%></p>
+
+<%if current_user.signups.find_by meetup_id: @meetup.id%>
+  <form action="/meetups/leave/<%=@meetup.id%>" method="post">
+    <input type="submit" value="Leave Meetup"/>
+  </form>
+<%else%>
+  <form action="/meetups/join/<%=@meetup.id%>" method="post">
+    <input type="submit" value="Join Meetup"/>
+  </form>
+<%end%>
+
+<h2>Current meetup members:</h2>
+<ul><%@members.each do |member|%>
+  <li><%=member.username%></li>
+<%end%>

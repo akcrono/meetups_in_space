@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/activerecord'
 require 'sinatra/flash'
 require 'omniauth-github'
+require 'pry'
 
 require_relative 'config/application'
 
@@ -29,6 +30,18 @@ def authenticate!
   end
 end
 
+#refactor in meetup class?
+def valid_meetup? meetup
+  if meetup["name"] == ''
+    return false
+  elsif meetup["location"] == ''
+    return false
+  elsif meetup["description"] == ''
+    return false
+  end
+  true
+end
+
 get '/' do
   erb :index
 end
@@ -52,4 +65,49 @@ end
 
 get '/example_protected_page' do
   authenticate!
+end
+
+get '/meetups/create' do
+  if !signed_in?
+    flash[:notice] = 'Not signed in'
+    redirect '/'
+  end
+  @meetup = params[:meetup] if params[:meetup]
+  erb :'meetups/create'
+end
+
+post '/meetups/submit' do
+  @meetup = params[:meetup]
+  if valid_meetup?(@meetup)
+    temp = Meetup.create(params[:meetup])
+    redirect "/meetups/#{temp.id}"
+  end
+  #todo notice takes two loads
+
+  flash.now[:notice] = 'Field blank'
+  erb :'meetups/create'
+end
+
+get '/meetups/all' do
+  @meetups = Meetup.all
+  erb :'meetups/all'
+end
+
+get '/meetups/:meetup_id' do
+  @meetup = Meetup.find(params[:meetup_id])
+  @members = @meetup.users
+  erb :'meetups/show'
+end
+
+post '/meetups/join/:meetup_id' do
+  Signup.create(user_id: current_user.id, meetup_id: params[:meetup_id])
+  redirect "/meetups/#{params[:meetup_id]}"
+
+end
+
+post '/meetups/leave/:meetup_id' do
+  signup = current_user.signups.find_by meetup_id: params[:meetup_id]
+  signup.delete
+  redirect "/meetups/#{params[:meetup_id]}"
+
 end
